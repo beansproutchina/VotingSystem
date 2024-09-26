@@ -55,6 +55,10 @@ export default {
             setTimeout(() => { this.d = false; }, 1);
         },
         submit() {
+            if (this.myVote.length < this.event.minselect) {
+                ElMessage.error("最少投" + this.event.minselect + "人。");
+                return;
+            }
             ElMessageBox.confirm(
                 '你确定要投票吗？',
                 '提示',

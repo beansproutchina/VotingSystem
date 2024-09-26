@@ -59,13 +59,23 @@ const start = async () => {
 
             app.post(`/api/${dir.name}`, async (req, res) => {
                 let body = req.body;
-                if (events[dir.name].voters[body.voter] == 0) {
+                if (events[dir.name].voters[body.voter] === 0) {
+                    if (body.votes.length < events[dir.name].minselect || body.votes.length > events[dir.name].maxselect) {
+                        res.send({ message: "Invalid Vote Count", result: 400 });
+                        return;
+                    }
                     for (let i = 0; i < body.votes.length; i++) {
+                        if (events[dir.name].candidates[body.votes[i]] === undefined) {
+                            res.send({ message: "Invalid Candidate", result: 400 });
+                            return;
+                        }
                         events[dir.name].candidates[body.votes[i]]++;
                     }
                     events[dir.name].voters[body.voter] = 1;
+                    setTimeout(() => {
+                        fs.writeFile(`./events/${dir.name}/result.json`, JSON.stringify(events[dir.name]),()=>{});
+                    }, 1);
                     res.send({ message: "OK", result: 200 });
-                    fs.writeFile(`./events/${dir.name}/result.json`, JSON.stringify(events[dir.name]));
                 } else {
                     res.send({ message: "Already Voted", result: 400 });
                 }
@@ -76,6 +86,10 @@ const start = async () => {
         }
     }
     try {
+
+        app.get(`/api/restartmefuckyou`, async (req, res) => {
+            process.exit(1);
+        })
         await app.listen({ port });
         console.log(`Server listening on http://localhost:${port}`);
     } catch (err) {
