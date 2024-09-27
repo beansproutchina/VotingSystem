@@ -4,7 +4,7 @@
 ```bash
 git clone https://github.com/beansproutchina/VotingSystem.git
 npm install
-npm run start
+pm2 start main.js
 ```
 现在你可在http://localhost:3225 看到投票页面。
 去http://localhost:3225/template 查看投票示例页面。
